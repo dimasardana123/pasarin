@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pasarin — Marketplace</title>
+<style>
+  :root{
+    --hijau: #5FB85C;
+    --hijau-gelap: #3F8F3D;
+    --hijau-muda: #E8F5E6;
+    --hijau-garis: #C9E6C5;
+    --teks: #1F2421;
+    --teks-sekunder: #6B7570;
+    --garis: #E2E8E0;
+    --putih: #FFFFFF;
+    --merah: #D14343;
+    --kuning: #C9962B;
+    --radius: 8px;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--teks);
+    background: var(--putih);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  button{ font-family: inherit; cursor:pointer; }
+  input{ font-family: inherit; }
+
+  a{ color: var(--hijau-gelap); text-decoration: none; }
+
+  /* ===== TOPBAR ===== */
+  .topbar{
+    border-bottom: 1px solid var(--garis);
+    position: sticky;
+    top: 0;
+    background: var(--putih);
+    z-index: 100;
+  }
+  .topbar-inner{
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 16px;
+  }
+  .brand{
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.3px;
+    display:flex;
+    align-items:center;
+    gap: 8px;
+  }
+  .brand-mark{
+    width: 22px; height: 22px;
+    background: var(--hijau);
+    border-radius: 5px;
+    flex-shrink:0;
+  }
+
+  .topnav{
+    display:flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .topnav button{
+    background: none;
+    border: none;
+    padding: 8px 14px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--teks-sekunder);
+  }
+  .topnav button:hover{ background: var(--hijau-muda); color: var(--teks); }
+  .topnav button.aktif{ background: var(--hijau-muda); color: var(--hijau-gelap); }
+
+  .topbar-aksi{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+  .ikon-btn{
+    position:relative;
+    background: none;
+    border: 1px solid var(--garis);
+    border-radius: var(--radius);
+    padding: 7px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--teks);
+  }
+  .ikon-btn:hover{ border-color: var(--hijau); }
+  .badge{
+    position:absolute;
+    top:-7px; right:-7px;
+    background: var(--hijau);
+    color:white;
+    font-size: 11px;
+    font-weight:700;
+    border-radius: 999px;
+    min-width:18px; height:18px;
+    display:flex; align-items:center; justify-content:center;
+    padding: 0 4px;
+  }
+  .btn-utama{
+    background: var(--hijau);
+    color: white;
+    border:none;
+    border-radius: var(--radius);
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .btn-utama:hover{ background: var(--hijau-gelap); }
+
+  .akun-info{
+    font-size: 13px;
+    color: var(--teks-sekunder);
+  }
+
+  /* ===== STRIP MENU CEPAT ===== */
+  .menu-cepat{
+    border-bottom: 1px solid var(--garis);
+    background: var(--putih);
+  }
+  .menu-cepat-inner{
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 10px 20px;
+    display:flex;
+    gap: 6px;
+    overflow-x: auto;
+  }
+  .menu-cepat-item{
+    background: none;
+    border: none;
+    border-radius: var(--radius);
+    padding: 8px 16px 7px;
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    gap: 4px;
+    color: var(--teks-sekunder);
+    flex-shrink: 0;
+    position: relative;
+    min-width: 64px;
+  }
+  .menu-cepat-item svg{ width:22px; height:22px; }
+  .menu-cepat-item span{ font-size: 11px; font-weight: 600; }
+  .menu-cepat-item:hover{ background: var(--hijau-muda); color: var(--hijau-gelap); }
+  .menu-cepat-item.aktif{ color: var(--hijau-gelap); }
+  .menu-cepat-item.aktif svg{ stroke: var(--hijau-gelap); }
+  .menu-cepat-badge{
+    position:absolute;
+    top: 4px; right: 10px;
+    background: var(--hijau);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 999px;
+    min-width:16px; height:16px;
+    display:flex; align-items:center; justify-content:center;
+    padding: 0 3px;
+  }
+
+  main{ max-width: 1040px; margin: 0 auto; padding: 32px 20px 80px; min-height: 60vh; }
+  .halaman{ display:none; }
+  .halaman.aktif{ display:block; }
+
+  /* ===== TYPOGRAPHY UMUM ===== */
+  h1{ font-size: 28px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 6px; }
+  h2{ font-size: 20px; font-weight: 700; letter-spacing: -0.2px; margin-bottom: 4px; }
+  .sub{ color: var(--teks-sekunder); font-size: 14px; margin-bottom: 24px; }
+  .eyebrow{
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--hijau-gelap);
+    margin-bottom: 6px;
+    display:block;
+  }
+
+  /* ===== HOME ===== */
+  .hero{
+    border: 1px solid var(--garis);
+    border-radius: 12px;
+    background: var(--hijau-muda);
+    padding: 36px 32px;
+    margin-bottom: 36px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .hero-teks h1{ font-size: 26px; max-width: 380px; }
+  .hero-teks p{ color: var(--teks-sekunder); font-size: 14px; max-width: 380px; margin-top:6px; }
+  .hero-cta{ margin-top: 18px; display:flex; gap:10px; }
+  .btn-garis{
+    background: none;
+    border: 1px solid var(--hijau-gelap);
+    color: var(--hijau-gelap);
+    border-radius: var(--radius);
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .btn-garis:hover{ background: var(--putih); }
+
+  .hero-stat{
+    display:flex;
+    gap: 28px;
+  }
+  .hero-stat div{ text-align:center; }
+  .hero-stat .n{ font-size: 22px; font-weight:700; }
+  .hero-stat .l{ font-size: 12px; color: var(--teks-sekunder); }
+
+  .section{ margin-bottom: 40px; }
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom: 16px;
+  }
+  .lihat-semua{ font-size: 13px; font-weight:600; color: var(--hijau-gelap); background:none; border:none; }
+
+  .grid-kategori{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+    gap: 10px;
+  }
+  .kategori-item{
+    border: 1px solid var(--garis);
+    border-radius: var(--radius);
+    padding: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--putih);
+    text-align:left;
+  }
+  .kategori-item:hover{ border-color: var(--hijau); background: var(--hijau-muda); }
+
+  .grid-produk{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+    gap: 16px;
+  }
+  .kartu-produk{
+    border: 1px solid var(--garis);
+    border-radius: 10px;
+    overflow:hidden;
+    background: var(--putih);
+    display:flex;
+    flex-direction:column;
+    transition: border-color 0.15s ease;
+  }
+  .kartu-produk:hover{ border-color: var(--hijau); }
+  .gambar-produk{
+    aspect-ratio: 1.1;
+    background: var(--hijau-muda);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-bottom: 1px solid var(--garis);
+  }
+  .gambar-produk svg{ width: 56%; height:56%; }
+  .info-produk{ padding: 12px 14px 14px; flex:1; display:flex; flex-direction:column; }
+  .info-produk .nama{ font-size: 14px; font-weight:600; margin-bottom: 2px; }
+  .info-produk .toko-nama{ font-size: 12px; color: var(--teks-sekunder); margin-bottom: 8px; }
+  .info-produk .harga{ font-size: 16px; font-weight:700; margin-bottom: 10px; }
+  .info-produk .rating{ font-size: 12px; color: var(--teks-sekunder); margin-bottom:10px; }
+  .btn-tambah{
+    margin-top:auto;
+    background: var(--hijau-muda);
+    color: var(--hijau-gelap);
+    border: 1px solid var(--hijau-garis);
+    border-radius: var(--radius);
+    padding: 8px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .btn-tambah:hover{ background: var(--hijau); color: white; border-color: var(--hijau); }
+
+  /* ===== AUTH (Daftar/Masuk) ===== */
+  .auth-wrap{
+    max-width: 380px;
+    margin: 20px auto;
+    border: 1px solid var(--garis);
+    border-radius: 12px;
+    padding: 32px;
+  }
+  .auth-tab{
+    display:flex;
+    border: 1px solid var(--garis);
+    border-radius: var(--radius);
+    padding: 3px;
+    margin-bottom: 22px;
+  }
+  .auth-tab button{
+    flex:1;
+    background:none;
+    border:none;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teks-sekunder);
+  }
+  .auth-tab button.aktif{ background: var(--hijau-muda); color: var(--hijau-gelap); }
+
+  .field{ margin-bottom: 14px; }
+  .field label{
+    display:block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  .field input{
+    width:100%;
+    border: 1px solid var(--garis);
+    border-radius: var(--radius);
+    padding: 9px 12px;
+    font-size: 14px;
+  }
+  .field input:focus{ outline:none; border-color: var(--hijau); }
+  .field-ket{ font-size: 12px; color: var(--teks-sekunder); margin-top:4px; }
+
+  .btn-blok{
+    width:100%;
+    background: var(--hijau);
+    color:white;
+    border:none;
+    border-radius: var(--radius);
+    padding: 11px;
+    font-size: 14px;
+    font-weight:700;
+    margin-top: 6px;
+  }
+  .btn-blok:hover{ background: var(--hijau-gelap); }
+
+  .pesan-info{
+    background: var(--hijau-muda);
+    border: 1px solid var(--hijau-garis);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--hijau-gelap);
+    margin-bottom: 16px;
+  }
+  .pesan-error{
+    background: #FBEAEA;
+    border: 1px solid #EFC2C2;
+    color: var(--merah);
+  }
+
+  /* ===== KERANJANG ===== */
+  .baris-keranjang{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--garis);
+  }
+  .baris-keranjang .mini-gambar{
+    width: 56px; height:56px;
+    background: var(--hijau-muda);
+    border-radius: var(--radius);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .baris-keranjang .mini-gambar svg{ width:60%; height:60%; }
+  .baris-keranjang .detail{ flex:1; }
+  .baris-keranjang .detail .nama{ font-weight:600; font-size:14px; }
+  .baris-keranjang .detail .satuan{ font-size:12px; color:var(--teks-sekunder); }
+  .jumlah-kontrol{
+    display:flex;
+    align-items:center;
+    border: 1px solid var(--garis);
+    border-radius: var(--radius);
+  }
+  .jumlah-kontrol button{
+    background:none; border:none; width:28px; height:28px; font-size:14px; font-weight:700; color: var(--teks-sekunder);
+  }
+  .jumlah-kontrol button:hover{ color: var(--hijau-gelap); }
+  .jumlah-kontrol span{ width: 28px; text-align:center; font-size:13px; font-weight:600; }
+  .subtotal-item{ font-weight:700; font-size:14px; width:90px; text-align:right; }
+  .hapus-item{ background:none; border:none; color: var(--teks-sekunder); font-size:12px; text-decoration:underline; }
+  .hapus-item:hover{ color: var(--merah); }
+
+  .ringkasan{
+    border: 1px solid var(--garis);
+    border-radius: 10px;
+    padding: 20px;
+    position: sticky;
+    top: 80px;
+  }
+  .ringkasan-baris{
+    display:flex;
+    justify-content:space-between;
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: var(--teks-sekunder);
+  }
+  .ringkasan-baris.total{
+    color: var(--teks);
+    font-weight: 700;
+    font-size: 16px;
+    border-top: 1px solid var(--garis);
+    padding-top: 12px;
+    margin-top: 4px;
+  }
+
+  .layout-2kol{
+    display:grid;
+    grid-template-columns: 1fr 300px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  .kosong-state{
+    text-align:center;
+    padding: 60px 20px;
+    color: var(--teks-sekunder);
+  }
+  .kosong-state svg{ width:64px; height:64px; margin-bottom:16px; opacity:0.5; }
+
+  /* ===== METODE BAYAR ===== */
+  .opsi-bayar{
+    border: 1px solid var(--garis);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    cursor:pointer;
+  }
+  .opsi-bayar:hover{ border-color: var(--hijau); }
+  .opsi-bayar.terpilih{ border-color: var(--hijau); background: var(--hijau-muda); }
+  .opsi-bayar input{ accent-color: var(--hijau); }
+  .opsi-bayar .label-utama{ font-weight:600; font-size:14px; }
+  .opsi-bayar .label-sub{ font-size:12px; color:var(--teks-sekunder); }
+
+  /* ===== TRACKING / STATUS PESANAN ===== */
+  .tracker{
+    display:flex;
+    align-items:flex-start;
+    margin: 28px 0 36px;
+  }
+  .tracker-step{
+    flex:1;
+    text-align:center;
+    position:relative;
+  }
+  .tracker-dot{
+    width: 28px; height:28px;
+    border-radius:50%;
+    background: var(--garis);
+    color: white;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 13px;
+    font-weight:700;
+    margin: 0 auto 8px;
+    position: relative;
+    z-index:2;
+  }
+  .tracker-step.selesai .tracker-dot{ background: var(--hijau); }
+  .tracker-step.aktif .tracker-dot{ background: var(--hijau-gelap); box-shadow: 0 0 0 4px var(--hijau-muda); }
+  .tracker-line{
+    position:absolute;
+    top: 14px; left:0; right:0;
+    height: 2px;
+    background: var(--garis);
+    z-index:1;
+  }
+  .tracker-step:first-child .tracker-line{ left:50%; }
+  .tracker-step:last-child .tracker-line{ right:50%; }
+  .tracker-step.selesai .tracker-line{ background: var(--hijau); }
+  .tracker-label{ font-size:12px; font-weight:600; }
+  .tracker-label.muted{ color: var(--teks-sekunder); font-weight:500; }
+  .tracker-waktu{ font-size:11px; color: var(--teks-sekunder); margin-top:2px; }
+
+  .kartu-pesanan{
+    border: 1px solid var(--garis);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .kartu-pesanan-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--garis);
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .kartu-pesanan-head .id-pesanan{ font-weight:700; font-size:14px; }
+  .kartu-pesanan-head .tgl-pesanan{ font-size:12px; color: var(--teks-sekunder); }
+  .status-chip{
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .status-chip.dikirim{ background: #FEF3DC; color: var(--kuning); }
+  .status-chip.selesai{ background: var(--hijau-muda); color: var(--hijau-gelap); }
+  .status-chip.diproses{ background: #EAF1FB; color: #3B6FB0; }
+
+  .pesanan-produk{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    padding: 8px 0;
+  }
+  .pesanan-produk .mini-gambar{
+    width: 44px; height:44px;
+    background: var(--hijau-muda);
+    border-radius: 6px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .pesanan-produk .mini-gambar svg{ width:60%; height:60%; }
+  .pesanan-produk .nama{ font-size:13px; font-weight:600; }
+  .pesanan-produk .qty{ font-size:12px; color:var(--teks-sekunder); }
+
+  /* ===== TENTANG ===== */
+  .tentang-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap: 20px;
+    margin-top: 24px;
+  }
+  .tentang-card{
+    border: 1px solid var(--garis);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .tentang-card .eyebrow{ margin-bottom: 10px; }
+  .tentang-card p{ font-size: 13px; color: var(--teks-sekunder); }
+
+  /* ===== DASHBOARD ===== */
+  .dash-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .dash-card{
+    border: 1px solid var(--garis);
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .dash-card .n{ font-size: 24px; font-weight:700; }
+  .dash-card .l{ font-size: 12px; color: var(--teks-sekunder); margin-top:2px; }
+
+  .chart-card{
+    border: 1px solid var(--garis);
+    border-radius: 10px;
+    padding: 22px;
+    margin-bottom: 28px;
+  }
+  .batang-wrap{
+    display:flex;
+    align-items:flex-end;
+    gap: 12px;
+    height: 160px;
+    border-bottom: 1px solid var(--garis);
+    padding-top: 16px;
+  }
+  .batang-item{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
+  .batang{ width: 60%; background: var(--hijau); border-radius: 3px 3px 0 0; transition: height 0.6s ease; }
+  .batang-label{ font-size: 11px; color: var(--teks-sekunder); margin-top: 6px; }
+  .batang-nilai{ font-size: 11px; font-weight:700; margin-bottom:4px; }
+
+  table{ width:100%; border-collapse: collapse; }
+  th{
+    text-align:left;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--teks-sekunder);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--garis);
+  }
+  td{
+    padding: 12px 12px;
+    border-bottom: 1px solid var(--garis);
+    font-size: 13px;
+  }
+
+  /* ===== SALDO ===== */
+  .saldo-kartu{
+    border: 1px solid var(--garis);
+    background: var(--hijau-muda);
+    border-radius: 12px;
+    padding: 26px 28px;
+  }
+  .saldo-label{ font-size: 13px; color: var(--teks-sekunder); font-weight:600; }
+  .saldo-jumlah{ font-size: 30px; font-weight: 700; margin-top: 4px; }
+
+  .riwayat-saldo-baris{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--garis);
+  }
+  .riwayat-saldo-baris .ket{ font-size:13px; font-weight:600; }
+  .riwayat-saldo-baris .tgl{ font-size:12px; color: var(--teks-sekunder); }
+  .riwayat-saldo-baris .jml{ font-weight:700; font-size:14px; }
+  .riwayat-saldo-baris .jml.masuk{ color: var(--hijau-gelap); }
+  .riwayat-saldo-baris .jml.keluar{ color: var(--merah); }
+
+  /* ===== AKUN ===== */
+  .profil-kartu{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    border: 1px solid var(--garis);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  .profil-avatar{
+    width: 48px; height:48px;
+    border-radius: 50%;
+    background: var(--hijau);
+    color: white;
+    display:flex; align-items:center; justify-content:center;
+    font-weight: 700;
+    font-size: 18px;
+    flex-shrink:0;
+  }
+  .profil-nama{ font-weight:700; font-size:15px; }
+  .profil-email{ font-size:13px; color: var(--teks-sekunder); }
+
+  .akun-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .akun-pilihan{
+    text-align:left;
+    background:none;
+    border: 1px solid var(--garis);
+    border-radius: var(--radius);
+    padding: 14px;
+    display:flex;
+    flex-direction:column;
+    gap: 2px;
+  }
+  .akun-pilihan:hover{ border-color: var(--hijau); background: var(--hijau-muda); }
+  .akun-pilihan .label-utama{ font-weight:600; font-size:14px; }
+  .akun-pilihan .label-sub{ font-size:12px; color: var(--teks-sekunder); }
+
+  footer{
+    border-top: 1px solid var(--garis);
+    padding: 20px;
+    text-align:center;
+    font-size: 12px;
+    color: var(--teks-sekunder);
+  }
+
+  @media (max-width: 720px){
+    .layout-2kol{ grid-template-columns: 1fr; }
+    .ringkasan{ position: static; }
+    .topnav{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="brand-mark"></span>Pasarin</div>
+    <nav class="topnav">
+      <button class="nav-btn aktif" data-target="home">Beranda</button>
+      <button class="nav-btn" data-target="tentang">Tentang</button>
+      <button class="nav-btn" data-target="menu">Produk</button>
+      <button class="nav-btn" data-target="dashboard">Dashboard</button>
+      <button class="nav-btn" data-target="pesanan">Pesanan Saya</button>
+    </nav>
+    <div class="topbar-aksi">
+      <span class="akun-info" id="infoAkun"></span>
+      <button class="ikon-btn" data-target="keranjang" onclick="bukaHalaman('keranjang')">
+        Keranjang<span class="badge" id="badgeKeranjang">0</span>
+      </button>
+      <button class="btn-utama" id="tombolAuth" onclick="bukaHalaman('auth')">Masuk</button>
+    </div>
+  </div>
+
+  <div class="menu-cepat">
+    <div class="menu-cepat-inner">
+      <button class="menu-cepat-item quick-btn aktif" data-target="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+        <span>Beranda</span>
+      </button>
+      <button class="menu-cepat-item quick-btn" data-target="keranjang">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M3 4h2l2.2 11.5a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/></svg>
+        <span>Keranjang</span>
+        <span class="menu-cepat-badge" id="badgeKeranjangCepat">0</span>
+      </button>
+      <button class="menu-cepat-item quick-btn" data-target="saldo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="13" rx="2"/><path d="M2.5 10h19"/><circle cx="16.5" cy="14" r="1.4"/></svg>
+        <span>Saldo</span>
+      </button>
+      <button class="menu-cepat-item quick-btn" data-target="pesanan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l3 5v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9l3-5Z"/><path d="M9 9h6"/></svg>
+        <span>Pesanan</span>
+      </button>
+      <button class="menu-cepat-item quick-btn" data-target="menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+        <span>Produk</span>
+      </button>
+      <button class="menu-cepat-item quick-btn" data-target="akun">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+        <span>Akun</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- ================= HOME ================= -->
+  <section class="halaman aktif" id="home">
+    <div class="hero">
+      <div class="hero-teks">
+        <span class="eyebrow">Marketplace lokal</span>
+        <h1>Belanja dari penjual sekitar, sampai ke depan pintu.</h1>
+        <p>Pasarin menghubungkan kamu dengan penjual kecil terdekat. Pesan, bayar, dan pantau pesanan dari satu tempat.</p>
+        <div class="hero-cta">
+          <button class="btn-utama" onclick="bukaHalaman('menu')">Lihat produk</button>
+          <button class="btn-garis" onclick="bukaHalaman('auth')">Buat akun</button>
+        </div>
+      </div>
+      <div class="hero-stat">
+        <div><div class="n">1.240</div><div class="l">Produk</div></div>
+        <div><div class="n">86</div><div class="l">Penjual</div></div>
+        <div><div class="n">4.7</div><div class="l">Rating rata-rata</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2>Kategori</h2></div>
+      <div class="grid-kategori" id="gridKategori"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Produk pilihan</h2>
+        <button class="lihat-semua" onclick="bukaHalaman('menu')">Lihat semua →</button>
+      </div>
+      <div class="grid-produk" id="produkUnggulan"></div>
+    </div>
+  </section>
+
+  <!-- ================= TENTANG ================= -->
+  <section class="halaman" id="tentang">
+    <span class="eyebrow">Tentang Pasarin</span>
+    <h1>Belanja dari penjual yang kamu kenal.</h1>
+    <p class="sub" style="max-width:520px;">Pasarin dibangun supaya proses jual-beli online jelas dari awal sampai akhir: kamu tahu siapa penjualnya, ke mana uangmu pergi, dan kapan barang sampai.</p>
+
+    <div class="tentang-grid">
+      <div class="tentang-card">
+        <span class="eyebrow">Akun</span>
+        <h2 style="font-size:15px;">Satu akun untuk semua transaksi</h2>
+        <p>Daftar sekali pakai nama dan email. Semua riwayat pesanan tersimpan rapi di satu tempat.</p>
+      </div>
+      <div class="tentang-card">
+        <span class="eyebrow">Pembayaran</span>
+        <h2 style="font-size:15px;">Pilih metode yang kamu pakai</h2>
+        <p>Transfer bank, e-wallet, atau bayar di tempat. Status pembayaran langsung terlihat di pesanan.</p>
+      </div>
+      <div class="tentang-card">
+        <span class="eyebrow">Pengiriman</span>
+        <h2 style="font-size:15px;">Pantau sampai barang diterima</h2>
+        <p>Setiap pesanan punya status berjalan: dipesan, dibayar, dikirim, lalu diterima.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MENU / PRODUK ================= -->
+  <section class="halaman" id="menu">
+    <h1>Semua produk</h1>
+    <p class="sub">Pilih produk, atur jumlah, lalu lanjutkan ke keranjang.</p>
+    <div class="grid-produk" id="produkSemua"></div>
+  </section>
+
+  <!-- ================= AUTH ================= -->
+  <section class="halaman" id="auth">
+    <div class="auth-wrap">
+      <div class="auth-tab">
+        <button id="tabDaftar" class="aktif" onclick="gantiTabAuth('daftar')">Daftar</button>
+        <button id="tabMasuk" onclick="gantiTabAuth('masuk')">Masuk</button>
+      </div>
+
+      <div id="formDaftar">
+        <div class="field">
+          <label>Nama lengkap</label>
+          <input type="text" id="daftarNama" placeholder="Nama kamu">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="daftarEmail" placeholder="nama@email.com">
+        </div>
+        <div class="field">
+          <label>Kata sandi</label>
+          <input type="password" id="daftarSandi" placeholder="Minimal 6 karakter">
+          <div class="field-ket">Ini simulasi, tidak ada data yang benar-benar disimpan ke server.</div>
+        </div>
+        <button class="btn-blok" onclick="prosesDaftar()">Buat akun</button>
+      </div>
+
+      <div id="formMasuk" style="display:none;">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="masukEmail" placeholder="nama@email.com">
+        </div>
+        <div class="field">
+          <label>Kata sandi</label>
+          <input type="password" id="masukSandi" placeholder="Kata sandi">
+        </div>
+        <button class="btn-blok" onclick="prosesMasuk()">Masuk</button>
+      </div>
+
+      <div id="pesanAuth"></div>
+    </div>
+  </section>
+
+  <!-- ================= KERANJANG ================= -->
+  <section class="halaman" id="keranjang">
+    <h1>Keranjang</h1>
+    <p class="sub">Periksa kembali produk sebelum lanjut ke pembayaran.</p>
+
+    <div id="keranjangIsi">
+      <div class="layout-2kol">
+        <div>
+          <div id="daftarKeranjang"></div>
+        </div>
+        <div class="ringkasan">
+          <div class="ringkasan-baris"><span>Subtotal</span><span id="ringkasanSubtotal">Rp0</span></div>
+          <div class="ringkasan-baris"><span>Ongkos kirim</span><span id="ringkasanOngkir">Rp0</span></div>
+          <div class="ringkasan-baris total"><span>Total</span><span id="ringkasanTotal">Rp0</span></div>
+          <button class="btn-blok" onclick="mulaiCheckout()">Lanjut ke pembayaran</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="keranjangKosong" class="kosong-state" style="display:none;">
+      <p style="font-weight:600; margin-bottom:4px;">Keranjang kamu masih kosong</p>
+      <p>Pilih produk dari halaman Produk untuk mulai belanja.</p>
+      <button class="btn-utama" style="margin-top:14px;" onclick="bukaHalaman('menu')">Lihat produk</button>
+    </div>
+  </section>
+
+  <!-- ================= CHECKOUT / BAYAR ================= -->
+  <section class="halaman" id="checkout">
+    <h1>Pembayaran</h1>
+    <p class="sub">Pilih metode pembayaran untuk menyelesaikan pesanan.</p>
+
+    <div class="layout-2kol">
+      <div>
+        <h2 style="font-size:15px; margin-bottom:12px;">Metode pembayaran</h2>
+
+        <label class="opsi-bayar" data-metode="saldo">
+          <input type="radio" name="metodeBayar" value="saldo">
+          <div><div class="label-utama">Saldo Pasarin</div><div class="label-sub" id="labelSaldoCheckout">Saldo tersedia: Rp0</div></div>
+        </label>
+        <label class="opsi-bayar" data-metode="transfer">
+          <input type="radio" name="metodeBayar" value="transfer">
+          <div><div class="label-utama">Transfer bank</div><div class="label-sub">BCA, Mandiri, BNI — konfirmasi otomatis</div></div>
+        </label>
+        <label class="opsi-bayar" data-metode="ewallet">
+          <input type="radio" name="metodeBayar" value="ewallet">
+          <div><div class="label-utama">E-wallet</div><div class="label-sub">GoPay, OVO, Dana</div></div>
+        </label>
+        <label class="opsi-bayar" data-metode="cod">
+          <input type="radio" name="metodeBayar" value="cod">
+          <div><div class="label-utama">Bayar di tempat (COD)</div><div class="label-sub">Bayar tunai saat barang sampai</div></div>
+        </label>
+
+        <div id="pesanCheckout" style="margin-top:14px;"></div>
+      </div>
+
+      <div class="ringkasan">
+        <div class="ringkasan-baris"><span>Subtotal</span><span id="checkoutSubtotal">Rp0</span></div>
+        <div class="ringkasan-baris"><span>Ongkos kirim</span><span id="checkoutOngkir">Rp0</span></div>
+        <div class="ringkasan-baris total"><span>Total bayar</span><span id="checkoutTotal">Rp0</span></div>
+        <button class="btn-blok" onclick="selesaikanPembayaran()">Bayar sekarang</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= KONFIRMASI ================= -->
+  <section class="halaman" id="konfirmasi">
+    <div style="max-width:480px; margin: 20px auto; text-align:center;">
+      <div style="width:56px;height:56px;background:var(--hijau-muda);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#3F8F3D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h1 style="font-size:22px;">Pesanan berhasil dibuat</h1>
+      <p class="sub" id="teksKonfirmasi">Nomor pesanan akan muncul di sini.</p>
+      <button class="btn-utama" onclick="bukaHalaman('pesanan')">Lihat status pesanan</button>
+    </div>
+  </section>
+
+  <!-- ================= PESANAN SAYA ================= -->
+  <section class="halaman" id="pesanan">
+    <h1>Pesanan saya</h1>
+    <p class="sub">Lacak status setiap pesanan sampai barang diterima.</p>
+    <div id="daftarPesanan"></div>
+    <div id="pesananKosong" class="kosong-state" style="display:none;">
+      <p style="font-weight:600;">Belum ada pesanan</p>
+      <p>Pesanan yang sudah dibayar akan muncul di sini.</p>
+    </div>
+  </section>
+
+  <!-- ================= SALDO ================= -->
+  <section class="halaman" id="saldo">
+    <h1>Saldo</h1>
+    <p class="sub">Saldo Pasarin bisa dipakai untuk membayar pesanan tanpa transfer ulang.</p>
+
+    <div class="saldo-kartu">
+      <div class="saldo-label">Saldo tersedia</div>
+      <div class="saldo-jumlah" id="saldoJumlah">Rp0</div>
+      <button class="btn-utama" style="margin-top:14px;" onclick="isiSaldo()">Isi saldo</button>
+    </div>
+
+    <h2 style="font-size:15px; margin:28px 0 14px;">Riwayat saldo</h2>
+    <div id="riwayatSaldo"></div>
+    <div id="saldoKosong" class="kosong-state" style="display:none;">
+      <p style="font-weight:600;">Belum ada riwayat</p>
+      <p>Isi saldo untuk mulai melihat riwayat di sini.</p>
+    </div>
+  </section>
+
+  <!-- ================= AKUN ================= -->
+  <section class="halaman" id="akun">
+    <h1>Akun</h1>
+    <div id="akunBelumMasuk" class="kosong-state" style="display:none;">
+      <p style="font-weight:600;">Kamu belum masuk</p>
+      <p>Masuk atau buat akun untuk melihat profil kamu.</p>
+      <button class="btn-utama" style="margin-top:14px;" onclick="bukaHalaman('auth')">Masuk / daftar</button>
+    </div>
+    <div id="akunSudahMasuk" style="display:none;">
+      <div class="profil-kartu">
+        <div class="profil-avatar" id="profilAvatar"></div>
+        <div>
+          <div class="profil-nama" id="profilNama"></div>
+          <div class="profil-email" id="profilEmail"></div>
+        </div>
+      </div>
+
+      <div class="akun-grid">
+        <button class="akun-pilihan" onclick="bukaHalaman('pesanan')">
+          <span class="label-utama">Pesanan saya</span>
+          <span class="label-sub">Lihat status pengiriman</span>
+        </button>
+        <button class="akun-pilihan" onclick="bukaHalaman('saldo')">
+          <span class="label-utama">Saldo</span>
+          <span class="label-sub">Kelola saldo Pasarin</span>
+        </button>
+      </div>
+
+      <button class="btn-garis" style="margin-top:20px;" onclick="keluarAkun()">Keluar dari akun</button>
+    </div>
+  </section>
+
+  <!-- ================= DASHBOARD ================= -->
+  <section class="halaman" id="dashboard">
+    <h1>Dashboard toko</h1>
+    <p class="sub">Ringkasan aktivitas marketplace.</p>
+
+    <div class="dash-grid">
+      <div class="dash-card"><div class="n">128</div><div class="l">Produk terjual</div></div>
+      <div class="dash-card"><div class="n">35</div><div class="l">Jenis produk</div></div>
+      <div class="dash-card"><div class="n">4.8</div><div class="l">Rating toko</div></div>
+      <div class="dash-card"><div class="n">12</div><div class="l">Pesanan baru</div></div>
+    </div>
+
+    <div class="chart-card">
+      <h2 style="font-size:15px; margin-bottom:16px;">Penjualan 7 hari terakhir</h2>
+      <div class="batang-wrap" id="chartBatang"></div>
+    </div>
+
+    <h2 style="font-size:15px; margin-bottom:14px;">Riwayat transaksi</h2>
+    <table>
+      <thead>
+        <tr><th>Produk</th><th>Pembeli</th><th>Tanggal</th><th>Total</th><th>Status</th></tr>
+      </thead>
+      <tbody id="riwayatBody"></tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer>Pasarin — simulasi marketplace untuk keperluan belajar</footer>
+
+<script>
+  /* ============ ICON SET (flat line, satu warna via currentColor) ============ */
+  const icon = (path) => `<svg viewBox="0 0 48 48" fill="none" stroke="#3F8F3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+
+  const ikonSayur   = icon(`<path d="M24 8c8 0 14 6 14 14 0 10-8 18-14 18S10 32 10 22C10 14 16 8 24 8Z"/><path d="M24 8V4"/><path d="M19 4h10"/>`);
+  const ikonBuah     = icon(`<circle cx="22" cy="26" r="14"/><path d="M22 12c2-4 6-6 10-6"/><path d="M28 6c1 2 1 4 0 6"/>`);
+  const ikonKopi     = icon(`<path d="M10 16h22v10a11 11 0 0 1-22 0V16Z"/><path d="M32 18h3a4 4 0 0 1 0 8h-3"/><path d="M14 8c0 2 2 2 2 4M22 8c0 2 2 2 2 4"/>`);
+  const ikonRoti     = icon(`<path d="M8 28V18c0-6 4-10 8-10h16c4 0 8 4 8 10v10a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 14v8M24 14v10M32 14v8"/>`);
+  const ikonBunga    = icon(`<circle cx="24" cy="16" r="5"/><circle cx="16" cy="22" r="5"/><circle cx="32" cy="22" r="5"/><circle cx="24" cy="28" r="5"/><path d="M24 33v9"/>`);
+  const ikonKerajinan= icon(`<rect x="10" y="10" width="28" height="28" rx="3"/><path d="M10 24h28M24 10v28"/>`);
+  const ikonTas      = icon(`<rect x="10" y="16" width="28" height="22" rx="3"/><path d="M17 16v-4a7 7 0 0 1 14 0v4"/>`);
+  const ikonKeranjangKosong = icon(`<circle cx="18" cy="40" r="2.5"/><circle cx="34" cy="40" r="2.5"/><path d="M6 8h6l4 24h22l4-16H14"/>`);
+
+  /* ============ DATA PRODUK ============ */
+  const produkData = [
+    {id:1, nama:"Sayur bayam segar", toko:"Tani Makmur", harga:8000, rating:4.8, kategori:"Sayur", icon:ikonSayur},
+    {id:2, nama:"Jeruk manis 1kg", toko:"Kebun Pak Slamet", harga:22000, rating:4.7, kategori:"Buah", icon:ikonBuah},
+    {id:3, nama:"Kopi robusta 250g", toko:"Kedai Seduh", harga:35000, rating:4.9, kategori:"Minuman", icon:ikonKopi},
+    {id:4, nama:"Roti gandum isi 6", toko:"Roti Bunda", harga:18000, rating:4.6, kategori:"Roti", icon:ikonRoti},
+    {id:5, nama:"Rangkaian bunga mawar", toko:"Toko Bunga Asri", harga:65000, rating:4.9, kategori:"Bunga", icon:ikonBunga},
+    {id:6, nama:"Tas anyam rotan", toko:"Kerajinan Lasem", harga:95000, rating:4.8, kategori:"Kerajinan", icon:ikonKerajinan},
+    {id:7, nama:"Tomat segar 1kg", toko:"Tani Makmur", harga:10000, rating:4.5, kategori:"Sayur", icon:ikonSayur},
+    {id:8, nama:"Tas selempang kanvas", toko:"Karya Lokal", harga:78000, rating:4.7, kategori:"Tas", icon:ikonTas},
+  ];
+
+  const kategoriData = [
+    {nama:"Sayur", icon:ikonSayur}, {nama:"Buah", icon:ikonBuah}, {nama:"Minuman", icon:ikonKopi},
+    {nama:"Roti", icon:ikonRoti}, {nama:"Bunga", icon:ikonBunga}, {nama:"Kerajinan", icon:ikonKerajinan},
+  ];
+
+  const ongkosKirim = 9000;
+
+  /* ============ STATE (in-memory, simulasi) ============ */
+  let akunAktif = null;
+  let keranjang = {};  // {id: qty}
+  let daftarPesananUser = [];
+  let nomorPesananBerjalan = 1024;
+  let saldoAktif = 0;
+  let riwayatSaldoUser = [];
+
+  function formatRupiah(n){ return "Rp" + n.toLocaleString('id-ID'); }
+
+  /* ============ RENDER PRODUK ============ */
+  function buatKartuProduk(p){
+    return `
+      <div class="kartu-produk">
+        <div class="gambar-produk">${p.icon}</div>
+        <div class="info-produk">
+          <div class="nama">${p.nama}</div>
+          <div class="toko-nama">${p.toko}</div>
+          <div class="rating">★ ${p.rating}</div>
+          <div class="harga">${formatRupiah(p.harga)}</div>
+          <button class="btn-tambah" onclick="tambahKeKeranjang(${p.id})">Tambah ke keranjang</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderKategori(){
+    document.getElementById('gridKategori').innerHTML = kategoriData.map(k =>
+      `<button class="kategori-item" onclick="bukaHalaman('menu')">${k.nama}</button>`
+    ).join('');
+  }
+
+  function renderProduk(){
+    document.getElementById('produkUnggulan').innerHTML = produkData.slice(0,4).map(buatKartuProduk).join('');
+    document.getElementById('produkSemua').innerHTML = produkData.map(buatKartuProduk).join('');
+  }
+
+  /* ============ NAVIGASI ============ */
+  function bukaHalaman(target){
+    document.querySelectorAll('.halaman').forEach(h => h.classList.remove('aktif'));
+    document.getElementById(target).classList.add('aktif');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('aktif', b.dataset.target === target));
+    document.querySelectorAll('.quick-btn').forEach(b => b.classList.toggle('aktif', b.dataset.target === target));
+
+    if(target === 'keranjang') renderKeranjang();
+    if(target === 'checkout') renderCheckout();
+    if(target === 'pesanan') renderPesanan();
+    if(target === 'saldo') renderSaldo();
+    if(target === 'akun') renderAkun();
+
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  document.querySelectorAll('.nav-btn, .quick-btn').forEach(btn => {
+    btn.addEventListener('click', () => bukaHalaman(btn.dataset.target));
+  });
+
+  /* ============ AUTH (simulasi, in-memory) ============ */
+  function gantiTabAuth(tab){
+    document.getElementById('tabDaftar').classList.toggle('aktif', tab === 'daftar');
+    document.getElementById('tabMasuk').classList.toggle('aktif', tab === 'masuk');
+    document.getElementById('formDaftar').style.display = tab === 'daftar' ? 'block' : 'none';
+    document.getElementById('formMasuk').style.display = tab === 'masuk' ? 'block' : 'none';
+    document.getElementById('pesanAuth').innerHTML = '';
+  }
+
+  function prosesDaftar(){
+    const nama = document.getElementById('daftarNama').value.trim();
+    const email = document.getElementById('daftarEmail').value.trim();
+    const sandi = document.getElementById('daftarSandi').value;
+    const pesan = document.getElementById('pesanAuth');
+
+    if(!nama || !email || !sandi){
+      pesan.innerHTML = `<div class="pesan-info pesan-error">Lengkapi nama, email, dan kata sandi terlebih dulu.</div>`;
+      return;
+    }
+    if(sandi.length < 6){
+      pesan.innerHTML = `<div class="pesan-info pesan-error">Kata sandi minimal 6 karakter.</div>`;
+      return;
+    }
+
+    akunAktif = {nama, email};
+    perbaruiTampilanAkun();
+    pesan.innerHTML = `<div class="pesan-info">Akun berhasil dibuat. Selamat datang, ${nama}.</div>`;
+    setTimeout(() => bukaHalaman('home'), 900);
+  }
+
+  function prosesMasuk(){
+    const email = document.getElementById('masukEmail').value.trim();
+    const sandi = document.getElementById('masukSandi').value;
+    const pesan = document.getElementById('pesanAuth');
+
+    if(!email || !sandi){
+      pesan.innerHTML = `<div class="pesan-info pesan-error">Masukkan email dan kata sandi.</div>`;
+      return;
+    }
+
+    const namaDariEmail = email.split('@')[0];
+    akunAktif = {nama: namaDariEmail, email};
+    perbaruiTampilanAkun();
+    pesan.innerHTML = `<div class="pesan-info">Berhasil masuk sebagai ${namaDariEmail}.</div>`;
+    setTimeout(() => bukaHalaman('home'), 900);
+  }
+
+  function keluarAkun(){
+    akunAktif = null;
+    perbaruiTampilanAkun();
+    bukaHalaman('home');
+  }
+
+  function perbaruiTampilanAkun(){
+    const info = document.getElementById('infoAkun');
+    const tombol = document.getElementById('tombolAuth');
+    if(akunAktif){
+      info.textContent = akunAktif.nama;
+      tombol.textContent = 'Keluar';
+      tombol.onclick = keluarAkun;
+    } else {
+      info.textContent = '';
+      tombol.textContent = 'Masuk';
+      tombol.onclick = () => bukaHalaman('auth');
+    }
+  }
+
+  /* ============ SALDO ============ */
+  function renderSaldo(){
+    document.getElementById('saldoJumlah').textContent = formatRupiah(saldoAktif);
+    const wrap = document.getElementById('riwayatSaldo');
+    const kosong = document.getElementById('saldoKosong');
+
+    if(riwayatSaldoUser.length === 0){
+      wrap.innerHTML = '';
+      kosong.style.display = 'block';
+      return;
+    }
+    kosong.style.display = 'none';
+    wrap.innerHTML = riwayatSaldoUser.map(r => `
+      <div class="riwayat-saldo-baris">
+        <div>
+          <div class="ket">${r.ket}</div>
+          <div class="tgl">${r.tanggal}</div>
+        </div>
+        <div class="jml ${r.tipe}">${r.tipe === 'masuk' ? '+' : '−'}${formatRupiah(r.jumlah)}</div>
+      </div>
+    `).join('');
+  }
+
+  function isiSaldo(){
+    if(!akunAktif){
+      bukaHalaman('auth');
+      return;
+    }
+    const jumlah = 50000;
+    saldoAktif += jumlah;
+    riwayatSaldoUser.unshift({
+      ket: 'Isi saldo',
+      tanggal: new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'}),
+      jumlah,
+      tipe: 'masuk'
+    });
+    renderSaldo();
+  }
+
+  /* ============ AKUN ============ */
+  function renderAkun(){
+    const belum = document.getElementById('akunBelumMasuk');
+    const sudah = document.getElementById('akunSudahMasuk');
+    if(!akunAktif){
+      belum.style.display = 'block';
+      sudah.style.display = 'none';
+      return;
+    }
+    belum.style.display = 'none';
+    sudah.style.display = 'block';
+    document.getElementById('profilAvatar').textContent = akunAktif.nama.charAt(0).toUpperCase();
+    document.getElementById('profilNama').textContent = akunAktif.nama;
+    document.getElementById('profilEmail').textContent = akunAktif.email;
+  }
+
+  /* ============ KERANJANG ============ */
+  function tambahKeKeranjang(id){
+    keranjang[id] = (keranjang[id] || 0) + 1;
+    perbaruiBadgeKeranjang();
+  }
+
+  function ubahJumlah(id, delta){
+    keranjang[id] = (keranjang[id] || 0) + delta;
+    if(keranjang[id] <= 0) delete keranjang[id];
+    perbaruiBadgeKeranjang();
+    renderKeranjang();
+  }
+
+  function hapusDariKeranjang(id){
+    delete keranjang[id];
+    perbaruiBadgeKeranjang();
+    renderKeranjang();
+  }
+
+  function perbaruiBadgeKeranjang(){
+    const total = Object.values(keranjang).reduce((a,b) => a+b, 0);
+    document.getElementById('badgeKeranjang').textContent = total;
+    document.getElementById('badgeKeranjangCepat').textContent = total;
+  }
+
+  function hitungSubtotal(){
+    return Object.entries(keranjang).reduce((sum, [id, qty]) => {
+      const p = produkData.find(x => x.id === parseInt(id));
+      return sum + (p ? p.harga * qty : 0);
+    }, 0);
+  }
+
+  function renderKeranjang(){
+    const ids = Object.keys(keranjang);
+    const isiEl = document.getElementById('keranjangIsi');
+    const kosongEl = document.getElementById('keranjangKosong');
+
+    if(ids.length === 0){
+      isiEl.style.display = 'none';
+      kosongEl.style.display = 'block';
+      kosongEl.querySelector('svg')?.remove();
+      kosongEl.insertAdjacentHTML('afterbegin', ikonKeranjangKosong);
+      return;
+    }
+    isiEl.style.display = 'block';
+    kosongEl.style.display = 'none';
+
+    document.getElementById('daftarKeranjang').innerHTML = ids.map(id => {
+      const p = produkData.find(x => x.id === parseInt(id));
+      const qty = keranjang[id];
+      return `
+        <div class="baris-keranjang">
+          <div class="mini-gambar">${p.icon}</div>
+          <div class="detail">
+            <div class="nama">${p.nama}</div>
+            <div class="satuan">${formatRupiah(p.harga)} / item</div>
+          </div>
+          <div class="jumlah-kontrol">
+            <button onclick="ubahJumlah(${p.id}, -1)">−</button>
+            <span>${qty}</span>
+            <button onclick="ubahJumlah(${p.id}, 1)">+</button>
+          </div>
+          <div class="subtotal-item">${formatRupiah(p.harga * qty)}</div>
+          <button class="hapus-item" onclick="hapusDariKeranjang(${p.id})">Hapus</button>
+        </div>
+      `;
+    }).join('');
+
+    const subtotal = hitungSubtotal();
+    document.getElementById('ringkasanSubtotal').textContent = formatRupiah(subtotal);
+    document.getElementById('ringkasanOngkir').textContent = formatRupiah(ongkosKirim);
+    document.getElementById('ringkasanTotal').textContent = formatRupiah(subtotal + ongkosKirim);
+  }
+
+  function mulaiCheckout(){
+    if(Object.keys(keranjang).length === 0) return;
+    if(!akunAktif){
+      bukaHalaman('auth');
+      return;
+    }
+    bukaHalaman('checkout');
+  }
+
+  /* ============ CHECKOUT ============ */
+  document.querySelectorAll('.opsi-bayar').forEach(opsi => {
+    opsi.addEventListener('click', () => {
+      document.querySelectorAll('.opsi-bayar').forEach(o => o.classList.remove('terpilih'));
+      opsi.classList.add('terpilih');
+      opsi.querySelector('input').checked = true;
+    });
+  });
+
+  function renderCheckout(){
+    const subtotal = hitungSubtotal();
+    document.getElementById('checkoutSubtotal').textContent = formatRupiah(subtotal);
+    document.getElementById('checkoutOngkir').textContent = formatRupiah(ongkosKirim);
+    document.getElementById('checkoutTotal').textContent = formatRupiah(subtotal + ongkosKirim);
+    document.getElementById('pesanCheckout').innerHTML = '';
+    document.getElementById('labelSaldoCheckout').textContent = `Saldo tersedia: ${formatRupiah(saldoAktif)}`;
+  }
+
+  function selesaikanPembayaran(){
+    const metode = document.querySelector('input[name="metodeBayar"]:checked');
+    const pesan = document.getElementById('pesanCheckout');
+    if(!metode){
+      pesan.innerHTML = `<div class="pesan-info pesan-error">Pilih salah satu metode pembayaran dulu.</div>`;
+      return;
+    }
+
+    const subtotal = hitungSubtotal();
+    const totalBayar = subtotal + ongkosKirim;
+
+    if(metode.value === 'saldo' && saldoAktif < totalBayar){
+      pesan.innerHTML = `<div class="pesan-info pesan-error">Saldo tidak cukup. Saldo kamu ${formatRupiah(saldoAktif)}, isi saldo dulu atau pilih metode lain.</div>`;
+      return;
+    }
+
+    const idPesanan = 'PSR-' + (nomorPesananBerjalan++);
+    const namaMetode = {saldo:'Saldo Pasarin', transfer:'Transfer bank', ewallet:'E-wallet', cod:'Bayar di tempat'}[metode.value];
+
+    if(metode.value === 'saldo'){
+      saldoAktif -= totalBayar;
+      riwayatSaldoUser.unshift({
+        ket: `Bayar pesanan ${idPesanan}`,
+        tanggal: new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'}),
+        jumlah: totalBayar,
+        tipe: 'keluar'
+      });
+    }
+
+    const itemPesanan = Object.entries(keranjang).map(([id, qty]) => {
+      const p = produkData.find(x => x.id === parseInt(id));
+      return {nama: p.nama, qty, icon: p.icon};
+    });
+
+    daftarPesananUser.unshift({
+      id: idPesanan,
+      tanggal: new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'}),
+      total: totalBayar,
+      metode: namaMetode,
+      status: metode.value === 'cod' ? 'diproses' : 'dikirim',
+      items: itemPesanan
+    });
+
+    keranjang = {};
+    perbaruiBadgeKeranjang();
+
+    document.getElementById('teksKonfirmasi').textContent =
+      `Nomor pesanan ${idPesanan} sudah tercatat. Pembayaran via ${namaMetode}.`;
+
+    bukaHalaman('konfirmasi');
+  }
+
+  /* ============ TRACKER STATUS ============ */
+  function buatTracker(status){
+    // urutan: dipesan -> dibayar -> dikirim -> diterima
+    const urutan = ['dipesan','dibayar','dikirim','diterima'];
+    const labelUrutan = ['Dipesan','Dibayar','Dikirim','Diterima'];
+    let indexAktif;
+    if(status === 'diproses') indexAktif = 1;       // sudah dipesan+dibayar, belum dikirim
+    else if(status === 'dikirim') indexAktif = 2;    // sedang dikirim
+    else indexAktif = 3;
+
+    return `
+      <div class="tracker">
+        ${urutan.map((u, i) => {
+          let kelas = '';
+          if(i < indexAktif) kelas = 'selesai';
+          else if(i === indexAktif) kelas = 'aktif';
+          return `
+            <div class="tracker-step ${kelas}">
+              <div class="tracker-line"></div>
+              <div class="tracker-dot">${i < indexAktif ? '✓' : i+1}</div>
+              <div class="tracker-label ${kelas ? '' : 'muted'}">${labelUrutan[i]}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  function renderPesanan(){
+    const wrap = document.getElementById('daftarPesanan');
+    const kosong = document.getElementById('pesananKosong');
+
+    if(daftarPesananUser.length === 0){
+      wrap.innerHTML = '';
+      kosong.style.display = 'block';
+      return;
+    }
+    kosong.style.display = 'none';
+
+    const labelStatus = {diproses:'Diproses', dikirim:'Dikirim', selesai:'Selesai'};
+
+    wrap.innerHTML = daftarPesananUser.map(p => `
+      <div class="kartu-pesanan">
+        <div class="kartu-pesanan-head">
+          <div>
+            <div class="id-pesanan">${p.id}</div>
+            <div class="tgl-pesanan">${p.tanggal} · ${p.metode}</div>
+          </div>
+          <span class="status-chip ${p.status}">${labelStatus[p.status]}</span>
+        </div>
+        ${buatTracker(p.status)}
+        ${p.items.map(it => `
+          <div class="pesanan-produk">
+            <div class="mini-gambar">${it.icon}</div>
+            <div>
+              <div class="nama">${it.nama}</div>
+              <div class="qty">Jumlah: ${it.qty}</div>
+            </div>
+          </div>
+        `).join('')}
+        <div style="text-align:right; font-weight:700; margin-top:10px; padding-top:10px; border-top:1px solid var(--garis);">
+          Total: ${formatRupiah(p.total)}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ============ DASHBOARD CHART ============ */
+  const dataChart = [
+    {hari:"Sen", nilai:12}, {hari:"Sel", nilai:18}, {hari:"Rab", nilai:9},
+    {hari:"Kam", nilai:22}, {hari:"Jum", nilai:30}, {hari:"Sab", nilai:25}, {hari:"Min", nilai:15},
+  ];
+
+  function renderChart(){
+    const maxNilai = Math.max(...dataChart.map(d => d.nilai));
+    const wrap = document.getElementById('chartBatang');
+    wrap.innerHTML = dataChart.map(d => `
+      <div class="batang-item">
+        <div class="batang-nilai">${d.nilai}</div>
+        <div class="batang" style="height:0%;" data-tinggi="${(d.nilai/maxNilai*100)}"></div>
+        <div class="batang-label">${d.hari}</div>
+      </div>
+    `).join('');
+    setTimeout(() => {
+      document.querySelectorAll('.batang').forEach(b => b.style.height = b.dataset.tinggi + '%');
+    }, 80);
+  }
+
+  const riwayatTransaksi = [
+    {produk:"Sayur bayam segar", pembeli:"Andi", tanggal:"15 Jun 2026", total:"Rp17.000", status:"Selesai"},
+    {produk:"Kopi robusta 250g", pembeli:"Siti", tanggal:"15 Jun 2026", total:"Rp44.000", status:"Selesai"},
+    {produk:"Rangkaian bunga mawar", pembeli:"Budi", tanggal:"16 Jun 2026", total:"Rp74.000", status:"Dikirim"},
+    {produk:"Tas anyam rotan", pembeli:"Rara", tanggal:"17 Jun 2026", total:"Rp104.000", status:"Diproses"},
+  ];
+  function renderRiwayat(){
+    document.getElementById('riwayatBody').innerHTML = riwayatTransaksi.map(r => `
+      <tr><td>${r.produk}</td><td>${r.pembeli}</td><td>${r.tanggal}</td><td>${r.total}</td><td>${r.status}</td></tr>
+    `).join('');
+  }
+
+  /* ============ INIT ============ */
+  renderKategori();
+  renderProduk();
+  renderChart();
+  renderRiwayat();
+  perbaruiTampilanAkun();
+  perbaruiBadgeKeranjang();
+</script>
+
+</body>
+</html>

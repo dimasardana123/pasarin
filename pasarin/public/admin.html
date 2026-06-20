@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pasarin — Admin Panel</title>
+<style>
+  :root{
+    --hijau:#5FB85C; --hijau-gelap:#3F8F3D; --hijau-muda:#E8F5E6; --hijau-garis:#C9E6C5;
+    --teks:#1F2421; --teks-sekunder:#6B7570; --garis:#E2E8E0; --putih:#FFFFFF;
+    --merah:#D14343; --kuning:#C9962B; --radius:8px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; color:var(--teks); background:#F7F9F6; font-size:14px;}
+  button{font-family:inherit; cursor:pointer;}
+  input,select{font-family:inherit;}
+  a{color:var(--hijau-gelap); text-decoration:none;}
+
+  /* LOGIN */
+  .login-wrap{min-height:100vh; display:flex; align-items:center; justify-content:center;}
+  .login-card{background:var(--putih); border:1px solid var(--garis); border-radius:12px; padding:32px; width:340px;}
+  .login-card h1{font-size:20px; margin-bottom:4px;}
+  .login-card p{color:var(--teks-sekunder); font-size:13px; margin-bottom:20px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:12px; font-weight:600; margin-bottom:5px;}
+  .field input,.field select{width:100%; padding:9px 10px; border:1px solid var(--garis); border-radius:var(--radius); font-size:14px;}
+  .field input:focus,.field select:focus{outline:none; border-color:var(--hijau);}
+  .btn{background:var(--hijau); color:#fff; border:none; border-radius:var(--radius); padding:10px 16px; font-size:14px; font-weight:600; width:100%;}
+  .btn:hover{background:var(--hijau-gelap);}
+  .btn-kecil{padding:6px 10px; font-size:12px; width:auto;}
+  .btn-garis{background:none; border:1px solid var(--garis); color:var(--teks);}
+  .btn-garis:hover{border-color:var(--hijau);}
+  .btn-merah{background:var(--merah);}
+  .btn-merah:hover{background:#a93333;}
+  .pesan-error{background:#FDEDED; color:var(--merah); padding:9px 12px; border-radius:var(--radius); font-size:13px; margin-top:10px;}
+  .pesan-ok{background:var(--hijau-muda); color:var(--hijau-gelap); padding:9px 12px; border-radius:var(--radius); font-size:13px; margin-top:10px;}
+
+  /* LAYOUT ADMIN */
+  .app{display:none; min-height:100vh;}
+  .app.aktif{display:flex;}
+  .sidebar{width:210px; background:var(--putih); border-right:1px solid var(--garis); padding:20px 14px; flex-shrink:0;}
+  .brand{font-weight:700; font-size:17px; margin-bottom:24px; display:flex; align-items:center; gap:8px;}
+  .brand-mark{width:20px; height:20px; background:var(--hijau); border-radius:5px;}
+  .nav-item{display:block; width:100%; text-align:left; background:none; border:none; padding:10px 12px; border-radius:var(--radius); font-size:13px; font-weight:600; color:var(--teks-sekunder); margin-bottom:2px;}
+  .nav-item:hover{background:var(--hijau-muda); color:var(--teks);}
+  .nav-item.aktif{background:var(--hijau-muda); color:var(--hijau-gelap);}
+  .keluar-btn{margin-top:20px; font-size:12px; color:var(--merah); background:none; border:none; font-weight:600;}
+
+  .konten{flex:1; padding:28px 32px; max-width:1100px;}
+  .konten h1{font-size:22px; margin-bottom:4px;}
+  .sub{color:var(--teks-sekunder); font-size:13px; margin-bottom:22px;}
+  .halaman-admin{display:none;}
+  .halaman-admin.aktif{display:block;}
+
+  .grid-stat{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px;}
+  .stat-kartu{background:var(--putih); border:1px solid var(--garis); border-radius:10px; padding:16px 18px;}
+  .stat-kartu .l{font-size:12px; color:var(--teks-sekunder); font-weight:600;}
+  .stat-kartu .n{font-size:24px; font-weight:700; margin-top:4px;}
+
+  table{width:100%; border-collapse:collapse; background:var(--putih); border:1px solid var(--garis); border-radius:10px; overflow:hidden;}
+  th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--teks-sekunder); padding:10px 12px; background:#FAFBF9; border-bottom:1px solid var(--garis);}
+  td{padding:10px 12px; border-bottom:1px solid var(--garis); font-size:13px;}
+  tr:last-child td{border-bottom:none;}
+  .chip{font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px; display:inline-block;}
+  .chip.diproses{background:#FDF3E3; color:var(--kuning);}
+  .chip.dikirim{background:#E6EEFD; color:#3158C4;}
+  .chip.selesai{background:var(--hijau-muda); color:var(--hijau-gelap);}
+  .chip.admin{background:#F3E6FD; color:#7B3FBF;}
+  .chip.user{background:#EEF0EE; color:var(--teks-sekunder);}
+
+  .toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px; flex-wrap:wrap;}
+  .aksi-cell{display:flex; gap:6px;}
+
+  .modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; align-items:center; justify-content:center; z-index:200;}
+  .modal-overlay.aktif{display:flex;}
+  .modal{background:var(--putih); border-radius:12px; padding:24px; width:380px; max-height:85vh; overflow-y:auto;}
+  .modal h2{font-size:16px; margin-bottom:14px;}
+  .modal-aksi{display:flex; gap:8px; margin-top:16px;}
+  select{padding:9px 10px; border:1px solid var(--garis); border-radius:var(--radius); width:100%;}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <h1>Pasarin Admin</h1>
+    <p>Masuk dengan akun admin untuk mengelola marketplace.</p>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="admin@pasarin.id">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="loginPassword" placeholder="Password">
+    </div>
+    <button class="btn" onclick="prosesLogin()">Masuk</button>
+    <div id="pesanLogin"></div>
+  </div>
+</div>
+
+<!-- ================= APP ADMIN ================= -->
+<div class="app" id="app">
+  <div class="sidebar">
+    <div class="brand"><span class="brand-mark"></span>Pasarin Admin</div>
+    <button class="nav-item aktif" data-target="dashboard" onclick="bukaHalamanAdmin('dashboard')">Dashboard</button>
+    <button class="nav-item" data-target="produk" onclick="bukaHalamanAdmin('produk')">Produk</button>
+    <button class="nav-item" data-target="kategori" onclick="bukaHalamanAdmin('kategori')">Kategori</button>
+    <button class="nav-item" data-target="pesanan" onclick="bukaHalamanAdmin('pesanan')">Pesanan</button>
+    <button class="nav-item" data-target="pengguna" onclick="bukaHalamanAdmin('pengguna')">Pengguna</button>
+    <button class="keluar-btn" onclick="logoutAdmin()">Keluar</button>
+  </div>
+
+  <div class="konten">
+
+    <!-- DASHBOARD -->
+    <section class="halaman-admin aktif" id="halDashboard">
+      <h1>Dashboard</h1>
+      <p class="sub">Ringkasan performa marketplace.</p>
+      <div class="grid-stat" id="gridStat"></div>
+      <h2 style="font-size:15px; margin-bottom:10px;">Pesanan terbaru</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Pembeli</th><th>Total</th><th>Status</th></tr></thead>
+        <tbody id="bodyPesananTerbaru"></tbody>
+      </table>
+    </section>
+
+    <!-- PRODUK -->
+    <section class="halaman-admin" id="halProduk">
+      <div class="toolbar">
+        <div><h1>Produk</h1><p class="sub" style="margin-bottom:0;">Kelola produk yang dijual.</p></div>
+        <button class="btn btn-kecil" style="width:auto;" onclick="bukaModalProduk()">+ Tambah produk</button>
+      </div>
+      <table>
+        <thead><tr><th>Nama</th><th>Toko</th><th>Kategori</th><th>Harga</th><th>Stok</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody id="bodyProduk"></tbody>
+      </table>
+    </section>
+
+    <!-- KATEGORI -->
+    <section class="halaman-admin" id="halKategori">
+      <div class="toolbar">
+        <div><h1>Kategori</h1><p class="sub" style="margin-bottom:0;">Kelola kategori produk.</p></div>
+        <button class="btn btn-kecil" style="width:auto;" onclick="bukaModalKategori()">+ Tambah kategori</button>
+      </div>
+      <table>
+        <thead><tr><th>Nama</th><th>Icon</th><th>Aksi</th></tr></thead>
+        <tbody id="bodyKategori"></tbody>
+      </table>
+    </section>
+
+    <!-- PESANAN -->
+    <section class="halaman-admin" id="halPesanan">
+      <h1>Pesanan</h1>
+      <p class="sub">Kelola status pengiriman pesanan pembeli.</p>
+      <table>
+        <thead><tr><th>ID</th><th>Pembeli</th><th>Tanggal</th><th>Metode</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody id="bodyPesanan"></tbody>
+      </table>
+    </section>
+
+    <!-- PENGGUNA -->
+    <section class="halaman-admin" id="halPengguna">
+      <h1>Pengguna</h1>
+      <p class="sub">Kelola akun pembeli dan admin.</p>
+      <table>
+        <thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Saldo</th><th>Aksi</th></tr></thead>
+        <tbody id="bodyPengguna"></tbody>
+      </table>
+    </section>
+
+  </div>
+</div>
+
+<!-- ===== MODAL PRODUK ===== -->
+<div class="modal-overlay" id="modalProduk">
+  <div class="modal">
+    <h2 id="judulModalProduk">Tambah Produk</h2>
+    <input type="hidden" id="produkId">
+    <div class="field"><label>Nama produk</label><input id="produkNama"></div>
+    <div class="field"><label>Toko</label><input id="produkToko"></div>
+    <div class="field"><label>Kategori</label><select id="produkKategori"></select></div>
+    <div class="field"><label>Harga (Rp)</label><input type="number" id="produkHarga"></div>
+    <div class="field"><label>Stok</label><input type="number" id="produkStok"></div>
+    <div class="field"><label>Rating</label><input type="number" step="0.1" max="5" min="0" id="produkRating" value="5.0"></div>
+    <div class="field">
+      <label>Status</label>
+      <select id="produkAktif"><option value="1">Aktif</option><option value="0">Nonaktif</option></select>
+    </div>
+    <div class="modal-aksi">
+      <button class="btn btn-garis" onclick="tutupModal('modalProduk')">Batal</button>
+      <button class="btn" onclick="simpanProduk()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL KATEGORI ===== -->
+<div class="modal-overlay" id="modalKategori">
+  <div class="modal">
+    <h2 id="judulModalKategori">Tambah Kategori</h2>
+    <input type="hidden" id="kategoriId">
+    <div class="field"><label>Nama kategori</label><input id="kategoriNama"></div>
+    <div class="field"><label>Icon (kode bebas)</label><input id="kategoriIcon" placeholder="contoh: sayur"></div>
+    <div class="modal-aksi">
+      <button class="btn btn-garis" onclick="tutupModal('modalKategori')">Batal</button>
+      <button class="btn" onclick="simpanKategori()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL TOPUP SALDO ===== -->
+<div class="modal-overlay" id="modalSaldo">
+  <div class="modal">
+    <h2>Tambah Saldo Pengguna</h2>
+    <input type="hidden" id="saldoUserId">
+    <div class="field"><label>Jumlah (Rp)</label><input type="number" id="saldoJumlah"></div>
+    <div class="field"><label>Keterangan</label><input id="saldoKeterangan" placeholder="Top-up oleh admin"></div>
+    <div class="modal-aksi">
+      <button class="btn btn-garis" onclick="tutupModal('modalSaldo')">Batal</button>
+      <button class="btn" onclick="simpanTopup()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = '/api'; // ganti ke URL backend jika dideploy terpisah, contoh: 'https://api.pasarin.id/api'
+  let token = localStorage.getItem('pasarin_admin_token') || '';
+  let kategoriCache = [];
+
+  function formatRupiah(n){ return 'Rp' + Number(n).toLocaleString('id-ID'); }
+
+  async function api(path, method='GET', body=null){
+    const res = await fetch(API + path, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+      },
+      body: body ? JSON.stringify(body) : null
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Terjadi kesalahan.');
+    return data;
+  }
+
+  /* ============ LOGIN ============ */
+  async function prosesLogin(){
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const pesan = document.getElementById('pesanLogin');
+    pesan.innerHTML = '';
+    try{
+      const data = await api('/auth/login', 'POST', { email, password });
+      if(data.user.role !== 'admin'){
+        pesan.innerHTML = `<div class="pesan-error">Akun ini bukan admin.</div>`;
+        return;
+      }
+      token = data.token;
+      localStorage.setItem('pasarin_admin_token', token);
+      tampilkanApp();
+    }catch(e){
+      pesan.innerHTML = `<div class="pesan-error">${e.message}</div>`;
+    }
+  }
+
+  function logoutAdmin(){
+    token = '';
+    localStorage.removeItem('pasarin_admin_token');
+    document.getElementById('app').classList.remove('aktif');
+    document.getElementById('loginWrap').style.display = 'flex';
+  }
+
+  function tampilkanApp(){
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('app').classList.add('aktif');
+    muatDashboard();
+    muatKategori();
+    muatProduk();
+    muatPesanan();
+    muatPengguna();
+  }
+
+  /* ============ NAVIGASI ============ */
+  function bukaHalamanAdmin(target){
+    document.querySelectorAll('.halaman-admin').forEach(h => h.classList.remove('aktif'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('aktif'));
+    document.getElementById('hal' + target.charAt(0).toUpperCase() + target.slice(1)).classList.add('aktif');
+    document.querySelector(`.nav-item[data-target="${target}"]`).classList.add('aktif');
+  }
+
+  /* ============ DASHBOARD ============ */
+  async function muatDashboard(){
+    try{
+      const s = await api('/admin/statistik');
+      document.getElementById('gridStat').innerHTML = `
+        <div class="stat-kartu"><div class="l">Total produk</div><div class="n">${s.totalProduk}</div></div>
+        <div class="stat-kartu"><div class="l">Total pengguna</div><div class="n">${s.totalUser}</div></div>
+        <div class="stat-kartu"><div class="l">Total pesanan</div><div class="n">${s.totalPesanan}</div></div>
+        <div class="stat-kartu"><div class="l">Total pendapatan</div><div class="n">${formatRupiah(s.totalPendapatan)}</div></div>
+      `;
+      const pesanan = await api('/admin/semua'.replace('admin','pesanan/admin'));
+      document.getElementById('bodyPesananTerbaru').innerHTML = pesanan.slice(0,5).map(p => `
+        <tr><td>${p.id}</td><td>${p.nama_pembeli}</td><td>${formatRupiah(p.total)}</td>
+        <td><span class="chip ${p.status}">${p.status}</span></td></tr>
+      `).join('');
+    }catch(e){ console.error(e); }
+  }
+
+  /* ============ KATEGORI ============ */
+  async function muatKategori(){
+    kategoriCache = await api('/kategori');
+    document.getElementById('bodyKategori').innerHTML = kategoriCache.map(k => `
+      <tr>
+        <td>${k.nama}</td><td>${k.icon}</td>
+        <td class="aksi-cell">
+          <button class="btn btn-garis btn-kecil" onclick='bukaModalKategori(${JSON.stringify(k)})'>Edit</button>
+          <button class="btn btn-merah btn-kecil" onclick="hapusKategori(${k.id})">Hapus</button>
+        </td>
+      </tr>
+    `).join('');
+    document.getElementById('produkKategori').innerHTML = kategoriCache.map(k => `<option value="${k.id}">${k.nama}</option>`).join('');
+  }
+
+  function bukaModalKategori(data){
+    document.getElementById('kategoriId').value = data?.id || '';
+    document.getElementById('kategoriNama').value = data?.nama || '';
+    document.getElementById('kategoriIcon').value = data?.icon || '';
+    document.getElementById('judulModalKategori').textContent = data ? 'Edit Kategori' : 'Tambah Kategori';
+    document.getElementById('modalKategori').classList.add('aktif');
+  }
+
+  async function simpanKategori(){
+    const id = document.getElementById('kategoriId').value;
+    const body = {
+      nama: document.getElementById('kategoriNama').value,
+      icon: document.getElementById('kategoriIcon').value
+    };
+    try{
+      if(id) await api('/kategori/' + id, 'PUT', body);
+      else await api('/kategori', 'POST', body);
+      tutupModal('modalKategori');
+      muatKategori();
+    }catch(e){ alert(e.message); }
+  }
+
+  async function hapusKategori(id){
+    if(!confirm('Hapus kategori ini?')) return;
+    try{ await api('/kategori/' + id, 'DELETE'); muatKategori(); }
+    catch(e){ alert(e.message); }
+  }
+
+  /* ============ PRODUK ============ */
+  async function muatProduk(){
+    const produk = await api('/produk/admin/semua');
+    document.getElementById('bodyProduk').innerHTML = produk.map(p => `
+      <tr>
+        <td>${p.nama}</td><td>${p.toko}</td><td>${p.kategori || '-'}</td>
+        <td>${formatRupiah(p.harga)}</td><td>${p.stok}</td>
+        <td><span class="chip ${p.aktif ? 'selesai' : 'diproses'}">${p.aktif ? 'Aktif' : 'Nonaktif'}</span></td>
+        <td class="aksi-cell">
+          <button class="btn btn-garis btn-kecil" onclick='bukaModalProduk(${JSON.stringify(p)})'>Edit</button>
+          <button class="btn btn-merah btn-kecil" onclick="hapusProduk(${p.id})">Hapus</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function bukaModalProduk(data){
+    document.getElementById('produkId').value = data?.id || '';
+    document.getElementById('produkNama').value = data?.nama || '';
+    document.getElementById('produkToko').value = data?.toko || '';
+    document.getElementById('produkHarga').value = data?.harga || '';
+    document.getElementById('produkStok').value = data?.stok ?? '';
+    document.getElementById('produkRating').value = data?.rating || 5.0;
+    document.getElementById('produkAktif').value = data ? (data.aktif ? '1' : '0') : '1';
+    if(data?.kategori_id) document.getElementById('produkKategori').value = data.kategori_id;
+    document.getElementById('judulModalProduk').textContent = data ? 'Edit Produk' : 'Tambah Produk';
+    document.getElementById('modalProduk').classList.add('aktif');
+  }
+
+  async function simpanProduk(){
+    const id = document.getElementById('produkId').value;
+    const body = {
+      nama: document.getElementById('produkNama').value,
+      toko: document.getElementById('produkToko').value,
+      kategori_id: document.getElementById('produkKategori').value || null,
+      harga: Number(document.getElementById('produkHarga').value),
+      stok: Number(document.getElementById('produkStok').value),
+      rating: Number(document.getElementById('produkRating').value),
+      aktif: Number(document.getElementById('produkAktif').value),
+      icon: 'produk'
+    };
+    try{
+      if(id) await api('/produk/' + id, 'PUT', body);
+      else await api('/produk', 'POST', body);
+      tutupModal('modalProduk');
+      muatProduk();
+    }catch(e){ alert(e.message); }
+  }
+
+  async function hapusProduk(id){
+    if(!confirm('Hapus produk ini?')) return;
+    try{ await api('/produk/' + id, 'DELETE'); muatProduk(); }
+    catch(e){ alert(e.message); }
+  }
+
+  /* ============ PESANAN ============ */
+  async function muatPesanan(){
+    const pesanan = await api('/pesanan/admin/semua');
+    document.getElementById('bodyPesanan').innerHTML = pesanan.map(p => `
+      <tr>
+        <td>${p.id}</td><td>${p.nama_pembeli}</td>
+        <td>${new Date(p.created_at).toLocaleDateString('id-ID')}</td>
+        <td>${p.metode_bayar}</td><td>${formatRupiah(p.total)}</td>
+        <td><span class="chip ${p.status}">${p.status}</span></td>
+        <td class="aksi-cell">
+          <select onchange="ubahStatusPesanan('${p.id}', this.value)">
+            <option ${p.status==='diproses'?'selected':''} value="diproses">Diproses</option>
+            <option ${p.status==='dikirim'?'selected':''} value="dikirim">Dikirim</option>
+            <option ${p.status==='selesai'?'selected':''} value="selesai">Selesai</option>
+          </select>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function ubahStatusPesanan(id, status){
+    try{ await api(`/pesanan/admin/${id}/status`, 'PUT', { status }); muatPesanan(); }
+    catch(e){ alert(e.message); }
+  }
+
+  /* ============ PENGGUNA ============ */
+  async function muatPengguna(){
+    const users = await api('/admin/users');
+    document.getElementById('bodyPengguna').innerHTML = users.map(u => `
+      <tr>
+        <td>${u.nama}</td><td>${u.email}</td>
+        <td><span class="chip ${u.role}">${u.role}</span></td>
+        <td>${formatRupiah(u.saldo)}</td>
+        <td class="aksi-cell">
+          <button class="btn btn-garis btn-kecil" onclick="bukaModalSaldo(${u.id})">+ Saldo</button>
+          <button class="btn btn-garis btn-kecil" onclick="toggleRole(${u.id}, '${u.role}')">${u.role==='admin'?'Jadikan user':'Jadikan admin'}</button>
+          <button class="btn btn-merah btn-kecil" onclick="hapusUser(${u.id})">Hapus</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function toggleRole(id, role){
+    const baru = role === 'admin' ? 'user' : 'admin';
+    try{ await api('/admin/users/' + id + '/role', 'PUT', { role: baru }); muatPengguna(); }
+    catch(e){ alert(e.message); }
+  }
+
+  async function hapusUser(id){
+    if(!confirm('Hapus pengguna ini?')) return;
+    try{ await api('/admin/users/' + id, 'DELETE'); muatPengguna(); }
+    catch(e){ alert(e.message); }
+  }
+
+  function bukaModalSaldo(id){
+    document.getElementById('saldoUserId').value = id;
+    document.getElementById('saldoJumlah').value = '';
+    document.getElementById('saldoKeterangan').value = '';
+    document.getElementById('modalSaldo').classList.add('aktif');
+  }
+
+  async function simpanTopup(){
+    const id = document.getElementById('saldoUserId').value;
+    const body = {
+      jumlah: Number(document.getElementById('saldoJumlah').value),
+      keterangan: document.getElementById('saldoKeterangan').value
+    };
+    try{
+      await api('/admin/users/' + id + '/saldo', 'POST', body);
+      tutupModal('modalSaldo');
+      muatPengguna();
+    }catch(e){ alert(e.message); }
+  }
+
+  function tutupModal(id){ document.getElementById(id).classList.remove('aktif'); }
+
+  /* ============ INIT ============ */
+  if(token){ tampilkanApp(); }
+</script>
+
+</body>
+</html>
